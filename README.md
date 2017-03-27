@@ -1,13 +1,15 @@
 # zEMPIRES
 Wololo!
 
-This project is an open source reimplementation of the [Genie engine](https://en.wikipedia.org/wiki/Genie_Engine) used on [Ensemble Studios](http://www.ensemblestudios.com/) [Age of Empires](https://en.wikipedia.org/wiki/Age_of_Empires_(video_game)) and [Star Wars: Galactic Battlegrounds](https://en.wikipedia.org/wiki/Star_Wars:_Galactic_Battlegrounds) game series. The core functionality is written in ANSI C, while the engine editor is written in C++ using [wxWidgets](https://www.wxwidgets.org/) for the Graphics User Interface (GUI). Apart from the vanilla engine builds, some improvements are intended. See the roadmap in [FEATURES.md](FEATURES.md). Most of the original engine documentation and reverse enginnering description is organized in the ['doc'](doc/) folder.
+This project is an open source reimplementation of the [Genie engine](https://en.wikipedia.org/wiki/Genie_Engine) used on [Ensemble Studios](http://www.ensemblestudios.com/) [Age of Empires](https://en.wikipedia.org/wiki/Age_of_Empires_(video_game)) and [Star Wars: Galactic Battlegrounds](https://en.wikipedia.org/wiki/Star_Wars:_Galactic_Battlegrounds) game series. The core functionality is written in ANSI C, while the engine editor is written in C++ using [wxWidgets](https://www.wxwidgets.org/) for the Graphics User Interface (GUI). Apart from the vanilla engine builds, some improvements are intended. See the roadmap in [FEATURES.md](FEATURES.md). Most of the original engine documentation and reverse enginnering description is organized in the ['libgff/doc'](src/libgff/doc/) folder.
 
 **Libraries**
 
 - wxWidgets 3.1.0
 - SDL 2.0.5
 - zlib 1.2.11
+- libttk
+- libgff
 
 # Credits
 
