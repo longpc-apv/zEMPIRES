@@ -52,6 +52,7 @@ Many people have contributed to the discovery of Genie engine file formats, and 
 - [ExtractDRS](https://github.com/LordAro/ExtractDRS)
 - [Genie](https://github.com/fredreichbier/genie)
 - [libaof](https://github.com/chrisforbes/libaof)
+- [agescx](https://github.com/dderevjanik/agescx)
 
 # Inspirational projects
 
