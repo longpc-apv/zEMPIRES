@@ -9,7 +9,7 @@ This project is an open source reimplementation of the [Genie engine](https://en
 - SDL 2.0.5
 - zlib 1.2.11
 
-**Credits**
+# Credits
 
 Many people have contributed to the discovery of Genie engine file formats, and therefore this project (indirectly). Most of the content (documentation) is available online. Here follows a list with some of the authors (sorry if I missed someone):
 
@@ -45,7 +45,7 @@ Many people have contributed to the discovery of Genie engine file formats, and 
 * [Mikko P (Tapsa)](https://github.com/Tapsa)
 * [Armin Preiml](https://github.com/apreiml)
 
-**Genie information sources and related projects**
+# Related projects
 
 - [GenieUtils](https://github.com/Tapsa/genieutils)
 - [AGE](https://github.com/Tapsa/AGE)
@@ -53,7 +53,7 @@ Many people have contributed to the discovery of Genie engine file formats, and 
 - [Genie](https://github.com/fredreichbier/genie)
 - [libaof](https://github.com/chrisforbes/libaof)
 
-**Inspirational projects**
+# Inspirational projects
 
 - [OpenAGE](https://github.com/SFTtech/openage)
 - [OpenMW](https://github.com/OpenMW/openmw)
