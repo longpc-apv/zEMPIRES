@@ -18,6 +18,20 @@
 GSLPFile*
 GSLP_DecodeFile(TtkBuffer *mem_buf)
 {
+  GSLPFile *slp_file;
+  GSLPFrame *slp_frame;
+
+  if (Ttk_BufSizeLeft(mem_buf) < sizeof(GSLPHeader))
+    return NULL;
+
+  slp_file = (GSLPFile*) malloc(sizeof(GSLPFile));
+
+  if (!slp_file)
+    return NULL;
+
+
+
+  return slp_file;
 }
 
 void

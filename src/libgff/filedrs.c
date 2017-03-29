@@ -38,10 +38,8 @@ GDRS_DecodeFile(TtkBuffer *mem_buf)
   GDRSFile *drs_file;
   GDRSTable *drs_table;
 
-  if (!mem_buf)
-    return NULL;
-
-  if ((mem_buf->length - mem_buf->offset) < sizeof(GDRSHeader))
+  /* This works even if mem_buf is NULL */
+  if (Ttk_BufSizeLeft(mem_buf) < sizeof(GDRSHeader))
     return NULL;
 
   /*
@@ -60,7 +58,7 @@ GDRS_DecodeFile(TtkBuffer *mem_buf)
   Ttk_BufRead(& drs_file->header, sizeof(GDRSHeader), 1, mem_buf);
   read_size = drs_file->header.table_header_count * sizeof(GDRSTable);
 
-  if ((mem_buf->length - mem_buf->offset) < read_size)
+  if (Ttk_BufSizeLeft(mem_buf) < read_size)
     goto drs_fail;
 
   /*
@@ -81,7 +79,7 @@ GDRS_DecodeFile(TtkBuffer *mem_buf)
     {
       drs_table = &drs_file->tables[i];
 
-      if ((mem_buf->length - mem_buf->offset) < sizeof(GDRSTableHeader))
+      if (Ttk_BufSizeLeft(mem_buf) < sizeof(GDRSTableHeader))
         goto drs_entry_alloc_fail;
 
       Ttk_BufRead(& drs_table->header, sizeof(GDRSTableHeader), 1, mem_buf);
@@ -104,7 +102,7 @@ GDRS_DecodeFile(TtkBuffer *mem_buf)
       Ttk_BufSeek(mem_buf, drs_table->header.file_headers_offset, SEEK_SET);
       read_size = drs_table->header.file_header_count * sizeof(GDRSEntry);
 
-      if ((mem_buf->length - mem_buf->offset) < read_size)
+      if (Ttk_BufSizeLeft(mem_buf) < read_size)
         goto drs_entry_fail;
 
       Ttk_BufRead(drs_table->entries, sizeof(GDRSEntry),

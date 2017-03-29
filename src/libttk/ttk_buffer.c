@@ -37,6 +37,15 @@ Ttk_BufIsStringSafe (const TtkBuffer* buf)
   return TTK_FALSE;
 }
 
+size_t
+Ttk_BufSizeLeft(const TtkBuffer *buf)
+{
+  if (!buf)
+    return 0;
+
+  return (size_t) buf->length - buf->offset;
+}
+
 TtkBuffer*
 Ttk_BufAlloc (uint64_t buffer_size)
 {

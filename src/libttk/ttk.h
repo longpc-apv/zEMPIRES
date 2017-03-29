@@ -40,6 +40,8 @@ typedef struct {
     void*     data;       /* Pointer to data chunk */
 } TtkBuffer;
 
+size_t Ttk_BufSizeLeft(const TtkBuffer *buf);
+
 TtkBuffer* Ttk_BufAlloc (uint64_t buffer_size);
 void Ttk_BufFree (TtkBuffer* buf);
 
