@@ -81,19 +81,16 @@ GDRS_DecodeFile(TtkBuffer *mem_buf)
     {
       drs_table = &drs_file->tables[i];
 
+      if ((mem_buf->length - mem_buf->offset) < sizeof(GDRSTableHeader))
+        goto drs_entry_alloc_fail;
+
       Ttk_BufRead(& drs_table->header, sizeof(GDRSTableHeader), 1, mem_buf);
 
       drs_table->entries = (GDRSEntry*)
         malloc(sizeof(GDRSEntry) * drs_table->header.file_header_count);
 
       if (!drs_table->entries)
-        {
-          for (j = 0; j < i; j++)
-            free(drs_file->tables[j].entries);
-
-          free(drs_file->tables);
-          goto drs_fail;
-        }
+        goto drs_entry_alloc_fail;
     }
 
   /*
@@ -116,12 +113,19 @@ GDRS_DecodeFile(TtkBuffer *mem_buf)
 
   return drs_file;
 
-drs_fail:
-  free(drs_file);
-  return NULL;
+drs_entry_alloc_fail:
+  for (j = 0; j < i; j++)
+    free(drs_file->tables[j].entries);
+
+  free(drs_file->tables);
+  goto drs_fail;
 
 drs_entry_fail:
   GDRS_DestroyFile(drs_file);
+  return NULL;
+
+drs_fail:
+  free(drs_file);
   return NULL;
 }
 
