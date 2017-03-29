@@ -99,7 +99,7 @@ GDRS_DecodeFile(TtkBuffer *mem_buf)
     {
       drs_table = &drs_file->tables[i];
 
-      Ttk_BufSeek(mem_buf, drs_table->header.file_headers_offset, SEEK_SET);
+      Ttk_BufSeek(mem_buf, drs_table->header.file_headers_offset, TTK_SEEK_SET);
       read_size = drs_table->header.file_header_count * sizeof(GDRSEntry);
 
       if (Ttk_BufSizeLeft(mem_buf) < read_size)
