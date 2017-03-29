@@ -143,11 +143,11 @@ GDRS_DestroyFile(GDRSFile *drs_file)
     {
       for (i = 0; i < drs_file->header.table_header_count; ++i)
         if (drs_file->tables[i].entries)
-          free (drs_file->tables[i].entries);
+          free(drs_file->tables[i].entries);
 
-      free (drs_file->tables);
+      free(drs_file->tables);
     }
 
   /* This is necessary for the filesystem linked list */
-  free (drs_file);
+  free(drs_file);
 }

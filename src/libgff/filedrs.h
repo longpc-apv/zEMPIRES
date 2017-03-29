@@ -50,7 +50,7 @@ typedef struct {
 /* Genie DRS table header */
 typedef struct {
   Gn_Byte     file_type;
-  char        extension[3];    /* File extention */
+  char        rev_extension[3];    /* File extention (reversed) */
 
   /*
    * NOTE: the order of offset/count on the header is different of the other
@@ -82,7 +82,7 @@ typedef struct GDRSFile {
   GDRSTable         *tables;
 } GDRSFile;
 
-GDRSFile* GDRS_DecodeFile(const TtkBuffer *mem_buf);
+GDRSFile* GDRS_DecodeFile(TtkBuffer *mem_buf);
 void GDRS_DestroyFile(GDRSFile *drs_file);
 
 #ifdef __cplusplus
