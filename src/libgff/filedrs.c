@@ -22,7 +22,7 @@
  * 28-mar-17 Rework: Now under libgff and using libttk for memory buffers.
  */
 
-#include "filesys.h"
+#include "filedrs.h"
 
 /*
  * GDRS_DecodeFile ()

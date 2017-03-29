@@ -12,7 +12,7 @@
  *      See license.md for copyright information.
  */
 
-#include "sprite.h"
+#include "fileslp.h"
 
 
 GSLPFile*
