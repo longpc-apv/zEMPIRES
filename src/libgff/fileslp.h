@@ -90,11 +90,11 @@ typedef struct {
   GSLPFrame       *frames;
 } GSLPFile;
 
-GSLPFile* GSLP_DecodeFile(const TtkBuffer *mem_buf);
+GSLPFile* GSLP_DecodeFile(TtkBuffer *mem_buf);
 void GSLP_DestroyFile(GSLPFile *slp_file);
 
-int GSLP_DecodeFrame(const GSLPFrame *slp_frame);
-int GSLP_EncodeFrame(const GSLPFrame *slp_frame);
+int GSLP_DecodeFrame(GSLPFrame *slp_frame);
+int GSLP_EncodeFrame(GSLPFrame *slp_frame);
 
 uint8_t* GSLP_GetRawData(const GSLPFrame *slp_frame);
 uint8_t* GSLP_GetRawDataPlayer(const GSLPFrame *slp_frame, int player_index);
