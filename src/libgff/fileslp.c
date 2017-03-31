@@ -133,6 +133,23 @@ GSLP_DecodeScanLine(uint8_t *src, uint8_t *dst)
   return dst - start;
 }
 
+static void
+GSLP_NeedPlayerIndex(GSLPFrame *slp_frame)
+{
+  int32_t i, pixel_count;
+
+  pixel_count = slp_frame->header.size_w * slp_frame->header.size_h;
+
+  for (i = 0; i < pixel_count; ++i)
+    if (slp_frame->civcol[i])
+      {
+        slp_frame->need_player = TTK_TRUE;
+        return;
+      }
+
+  slp_frame->need_player = TTK_FALSE;
+}
+
 static int32_t
 GSLP_DecodeFrameData(GSLPFrame *slp_frame, TtkBuffer *mem_buf)
 {
@@ -140,7 +157,7 @@ GSLP_DecodeFrameData(GSLPFrame *slp_frame, TtkBuffer *mem_buf)
   uint8_t *src, *dst, *msk;
 
   src = mem_buf->data + mem_buf->offset;
-  dst = slp_frame->decoded;
+  dst = slp_frame->dec_data;
   msk = slp_frame->civcol;
 
   for (i = 0; i < slp_frame->header.size_h; ++i)
@@ -173,7 +190,91 @@ GSLP_DecodeFrameData(GSLPFrame *slp_frame, TtkBuffer *mem_buf)
       dst += slp_frame->outline[i].dist_right + decoded_bytes;
       msk += slp_frame->outline[i].dist_right + decoded_bytes;
     }
+  slp_frame->decoded = TTK_TRUE;
+  GSLP_NeedPlayerIndex(slp_frame);
   return 0;
+}
+
+/*
+ * GSLP_GetEncodedSize()
+ *
+ * Dumb workaround to get the encoded pixel data size from the SLP file.
+ * We just seek for the last scanline command offset and search the end byte
+ * flag (0x0f) in the data. The encoded size is given by the distance to
+ * the first command offset.
+ *
+ * Note 1: To run this code we first need to parse the frame header and read
+ * the scanline command offsets and outlines.
+ *
+ * Note 2: This function may seem unecessary for the game code, but is useful
+ * for the engine editor (SLP file encoding and saving).
+ */
+static int32_t
+GSLP_GetEncodedSize(const GSLPFrame *slp_frame, const TtkBuffer *mem_buf)
+{
+  int32_t offset;
+  uint8_t *run;
+
+  if (!slp_frame || !mem_buf)
+    return -1;
+
+  offset = slp_frame->command[slp_frame->header.size_h-1];
+  run = mem_buf->data + offset;
+
+  while ((*run++ & 0x0f) != 0x0f)
+    offset++;
+
+  return offset - slp_frame->command[0];
+}
+
+static int
+GSLP_ConstructFrame(GSLPFrame *slp_frame)
+{
+  int32_t pixel_count;
+
+  if (!slp_frame)
+    return;
+
+  pixel_count = slp_frame->header.size_w * slp_frame->header.size_h;
+
+  slp_frame->command = (uint32_t*)
+    malloc(slp_frame->header.size_h * sizeof(uint32_t));
+
+  slp_frame->outline = (GSLPRowEdge*)
+    malloc(slp_frame->header.size_h * sizeof(GSLPRowEdge));
+
+  if (!slp_frame->command || !slp_frame->outline)
+    return -1
+
+  slp_frame->dec_data = (uint8_t*) malloc(pixel_count);
+  slp_frame->civcol = (uint8_t*) malloc(pixel_count);
+
+  if (!slp_frame->dec_data || !slp_frame->civcol)
+    return -1;
+
+  memset(slp_frame->dec_data, 0, pixel_count);
+  memset(slp_frame->civcol, 0, pixel_count);
+
+  slp_frame->encoded = TTK_FALSE;
+  slp_frame->decoded = TTK_FALSE;
+  slp_frame->need_player = TTK_FALSE;
+
+  return 0;
+}
+
+static void
+GSLP_DestroyFrame(GSLPFrame *slp_frame)
+{
+  if (!slp_frame)
+    return;
+
+#define GSLP_FREE(x) if (x) free(x)
+  GSLP_FREE(slp_frame->outline);
+  GSLP_FREE(slp_frame->command);
+  GSLP_FREE(slp_frame->dec_data);
+  GSLP_FREE(slp_frame->enc_data);
+  GSLP_FREE(slp_frame->civcol);
+#undef GSLP_FREE
 }
 
 GSLPFile*
@@ -221,12 +322,14 @@ GSLP_DecodeFile(TtkBuffer *mem_buf)
 
       pixel_count = slp_frame->header.size_w * slp_frame->header.size_h;
 
-      slp_frame->decoded = (uint8_t*) malloc(pixel_count);
+      slp_frame->dec_data = (uint8_t*) malloc(pixel_count);
+      slp_frame->civcol = (uint8_t*) malloc(pixel_count);
 
-      if (!slp_frame->decoded)
+      if (!slp_frame->dec_data || !slp_frame->civcol)
         goto slp_fail_alloc;
 
-      memset(slp_frame->decoded, 0, pixel_count);
+      memset(slp_frame->dec_data, 0, pixel_count);
+      memset(slp_frame->civcol, 0, pixel_count);
     }
 
   for (i = 0; i < slp_file->header.frame_count; ++i)
@@ -248,12 +351,9 @@ GSLP_DecodeFile(TtkBuffer *mem_buf)
   return slp_file;
 
 slp_fail_alloc:
-  for (j = 0; j < i; ++j)
-    {
-      free(slp_file->frames[j].command);
-      free(slp_file->frames[j].outline);
-      free(slp_file->frames[j].decoded);
-    }
+  for (j = 0; j <= i; ++j)
+    GSLP_DestroyFrame(&slp_file->frames[j]);
+
   free(slp_file->frames);
   goto slp_fail;
 
@@ -269,4 +369,20 @@ slp_fail:
 void
 GSLP_DestroyFile(GSLPFile *slp_file)
 {
+  int32_t i;
+
+  if (!slp_file)
+    return;
+
+  if (!slp_file->frames)
+    {
+      free(slp_file);
+      return;
+    }
+
+  for (i = 0; i < slp_file->header.frame_count; ++i)
+    GSLP_DestroyFrame(&slp_file->frames[i]);
+
+  free(slp_file->frames);
+  free(slp_file);
 }
